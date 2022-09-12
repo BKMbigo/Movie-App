@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Movie App</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Strings used for fragments for navigation -->
+    <string name="home_fragment_label">Home Fragment</string>
+
+    <!--  Home Strings  -->
+    <string name="label_search_...">Search…</string>
+    <string name="label_search_none">Cannot find any item matching the parameters given.\nPlease revise the parameters</string>
+
+    <!--  Movie Card Strings  -->
+    <string name="label_title">Title</string>
+    <string name="label_actors">Actors</string>
+    <string name="label_year">Year</string>
+    <string name="label_plot">Plot</string>
+    <string name="label_director">Director</string>
+
+    <string name="label_movie">Movie</string>
+    <string name="label_series">Series</string>
+    <string name="label_game">Game</string>
+    <string name="label_episode">Episode</string>
+
+
+</resources>
