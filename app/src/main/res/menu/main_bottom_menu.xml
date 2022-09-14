@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/latestFragment"
+        android:title="@string/label_latest"
+        android:icon="@drawable/ic_latest"/>
+
+    <item
+        android:id="@+id/watchListFragment"
+        android:title="@string/label_watch_list"
+        android:icon="@drawable/ic_watch_list"/>
+
+    <item
+        android:id="@+id/downloadListFragment"
+        android:title="@string/label_downloads"
+        android:icon="@drawable/ic_cloud_download"/>
+</menu>

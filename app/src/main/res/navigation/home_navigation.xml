@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_navigation"
+    app:startDestination="@id/latestFragment">
+
+    <fragment
+        android:id="@+id/latestFragment"
+        android:name="com.bkmbigo.movieapp.ui.main.home.latest.LatestFragment"
+        android:label="LatestFragment"
+        tools:layout="@layout/fragment_latest"/>
+    <fragment
+        android:id="@+id/watchListFragment"
+        android:name="com.bkmbigo.movieapp.ui.main.home.watchlist.WatchListFragment"
+        android:label="WatchListFragment"
+        tools:layout="@layout/fragment_watch_list"/>
+    <fragment
+        android:id="@+id/downloadListFragment"
+        android:name="com.bkmbigo.movieapp.ui.main.home.dowloadlist.DownloadListFragment"
+        android:label="DownloadListFragment"
+        tools:layout="@layout/fragment_download_list"/>
+</navigation>

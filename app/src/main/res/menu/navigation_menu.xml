@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item
+        android:id="@+id/main_item"
+        android:title="@string/label_main">
+        <menu>
+            <group
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/HomeFragment"
+                    android:icon="@drawable/ic_home"
+                    android:title="@string/label_home_fragment"/>
+
+                <item
+                    android:id="@+id/SearchFragment"
+                    android:icon="@drawable/ic_search"
+                    android:title="@string/label_search"/>
+
+
+            </group>
+
+        </menu>
+    </item>
+
+
+</menu>
