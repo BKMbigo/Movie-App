@@ -8,8 +8,14 @@
     <fragment
         android:id="@+id/HomeFragment"
         android:name="com.bkmbigo.movieapp.ui.main.home.HomeFragment"
-        android:label="@string/home_fragment_label"
-        tools:layout="@layout/fragment_home">
+        android:label="@string/label_home_fragment"
+        tools:layout="@layout/fragment_home"/>
+
+    <fragment
+        android:id="@+id/SearchFragment"
+        android:name="com.bkmbigo.movieapp.ui.main.search.SearchFragment"
+        android:label="@string/label_search"
+        tools:layout="@layout/fragment_search">
 
     </fragment>
 

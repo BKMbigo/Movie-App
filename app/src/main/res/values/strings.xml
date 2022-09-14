@@ -3,11 +3,30 @@
     <string name="action_settings">Settings</string>
 
     <!-- Strings used for fragments for navigation -->
-    <string name="home_fragment_label">Home Fragment</string>
+    <string name="label_main">Main</string>
+    <string name="label_home_fragment">Home</string>
+    <string name="label_search">Search</string>
+    <string name="label_watch">Watch</string>
+    <string name="label_latest">Latest</string>
+    <string name="label_downloads">Downloads</string>
 
-    <!--  Home Strings  -->
+    <!--  Home Fragment  -->
+    <!--  Latest Fragment  -->
+    <string name="label_psarips">PSArips</string>
+
+    <!--  List Strings  -->
+    <string name="label_grid">Grid</string>
+    <string name="label_list">List</string>
+
+    <!--  Search Strings  -->
     <string name="label_search_...">Search…</string>
     <string name="label_search_none">Cannot find any item matching the parameters given.\nPlease revise the parameters</string>
+
+    <!--  Bottom Sheet Strings  -->
+    <string name="label_download_list">Download List</string>
+    <string name="label_watch_list">Watch List</string>
+    <string name="label_actors_value">Actors: %s</string>
+    <string name="label_more_info">More Info</string>
 
     <!--  Movie Card Strings  -->
     <string name="label_title">Title</string>

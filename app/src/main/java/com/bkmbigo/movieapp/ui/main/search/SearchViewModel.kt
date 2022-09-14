@@ -1,6 +1,5 @@
-package com.bkmbigo.movieapp.ui.main.home
+package com.bkmbigo.movieapp.ui.main.search
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.bkmbigo.movieapp.api.OmdbApi
 import com.bkmbigo.movieapp.api.dto.SearchMovieDto
@@ -14,7 +13,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class HomeViewModel(
+class SearchViewModel(
     private val omdbApiKey: String,
     private val omdbApi: OmdbApi
 ) : ViewModel() {
@@ -23,6 +22,7 @@ class HomeViewModel(
     val movieResults: LiveData<List<SearchMovieDto>> = _movieResults
 
     private val _loading = MutableStateFlow(false)
+    fun changeLoading(loading: Boolean){_loading.value = loading}
     val loading: StateFlow<Boolean> = _loading
 
     suspend fun searchMovies(query: String, type: String) {
@@ -64,6 +64,6 @@ class HomeViewModel(
     ) : ViewModelProvider.NewInstanceFactory() {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            HomeViewModel(omdbApiKey, omdbApi) as T
+            SearchViewModel(omdbApiKey, omdbApi) as T
     }
 }

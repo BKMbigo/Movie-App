@@ -5,12 +5,20 @@
       <map>
         <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/drawable/image_shadow.xml" value="0.118" />
         <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/activity_main.xml" value="0.16" />
+        <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/bottom_sheet_movie.xml" value="0.36822916666666666" />
         <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/card_movie.xml" value="0.22" />
         <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/content_main.xml" value="0.16" />
+        <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/fragment_download_list.xml" value="0.16" />
         <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/fragment_first.xml" value="0.12" />
-        <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/fragment_home.xml" value="0.18" />
+        <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/fragment_home.xml" value="0.1" />
+        <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/fragment_latest.xml" value="0.14" />
+        <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/fragment_search.xml" value="0.14" />
         <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/fragment_second.xml" value="0.3692708333333333" />
+        <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/fragment_watch_list.xml" value="0.14" />
+        <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/layout/main_navigation_drawer.xml" value="0.2" />
+        <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/menu/main_bottom_menu.xml" value="0.17592592592592593" />
         <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/menu/menu_main.xml" value="0.17592592592592593" />
+        <entry key="..\:/Users/bkmbi/AndroidStudioProjects/MovieApp/app/src/main/res/menu/navigation_menu.xml" value="0.3729166666666667" />
       </map>
     </option>
   </component>

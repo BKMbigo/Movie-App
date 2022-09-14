@@ -10,8 +10,11 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.bkmbigo.movieapp.R
 import com.bkmbigo.movieapp.databinding.ActivityMainBinding
+import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,9 +29,17 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        val navView: NavigationView = binding.navView
+        val navHostController = supportFragmentManager.findFragmentById(binding.contentMain.navHostFragmentContentMain.id) as NavHostFragment
+
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.HomeFragment, R.id.SearchFragment
+            ),
+            binding.root)
+        setupActionBarWithNavController(navHostController.navController, appBarConfiguration)
+        navView.setupWithNavController(navHostController.navController)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -48,8 +59,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
+        val navHostController = supportFragmentManager.findFragmentById(binding.contentMain.navHostFragmentContentMain.id) as NavHostFragment
+        return navHostController.navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
     }
 }

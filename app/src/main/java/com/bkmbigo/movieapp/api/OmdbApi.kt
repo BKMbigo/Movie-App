@@ -1,5 +1,6 @@
 package com.bkmbigo.movieapp.api
 
+import com.bkmbigo.movieapp.api.dto.ParticularMovieDto
 import com.bkmbigo.movieapp.api.dto.SearchMovieDto
 import com.bkmbigo.movieapp.api.dto.SearchResultsDto
 import retrofit2.http.GET
@@ -16,6 +17,15 @@ interface OmdbApi{
         @Query("s") query: String,
         @Query("type") type: String,
     ): Call<SearchResultsDto>
+
+    @GET("/")
+    fun getParticularMovie(
+        @Query("apikey") apikey: String,
+        @Query("i") imdbID: String? = null,
+        @Query("type") type: String? = null,
+        @Query("t") title: String? = null,
+        @Query("plot") plot: String = "full"
+    ): Call<ParticularMovieDto>
 
     companion object{
         @Volatile
