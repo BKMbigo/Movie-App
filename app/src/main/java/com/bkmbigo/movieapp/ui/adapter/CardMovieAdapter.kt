@@ -8,13 +8,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bkmbigo.movieapp.R
-import com.bkmbigo.movieapp.api.dto.SearchMovieDto
 import com.bkmbigo.movieapp.databinding.CardMovieBinding
+import com.bkmbigo.movieapp.domain.model.Movie
 import com.bumptech.glide.Glide
 
 class CardMovieAdapter(
     private val movieClickListener: MovieClickListener,
-): ListAdapter<SearchMovieDto, CardMovieAdapter.CardMovieViewHolder>(CardMovieDiffUtil()) {
+) : ListAdapter<Movie, CardMovieAdapter.CardMovieViewHolder>(CardMovieDiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardMovieViewHolder {
         val binding = CardMovieBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -28,47 +28,43 @@ class CardMovieAdapter(
     class CardMovieViewHolder(
         private val binding: CardMovieBinding,
         private val movieClickListener: MovieClickListener
-    ) : RecyclerView.ViewHolder(binding.root){
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
-        fun bind(searchMovieDto: SearchMovieDto){
-            binding.tvTitle.text = if(searchMovieDto.year == null) searchMovieDto.title else "${searchMovieDto.title}(${searchMovieDto.year})"
+        fun bind(movie: Movie) {
+            binding.tvTitle.text = movie.title
             Glide.with(binding.root.context)
-                .load(searchMovieDto.posterURL)
+                .load(movie.posterURL)
                 .placeholder(ContextCompat.getDrawable(binding.root.context, R.drawable.ic_movie))
                 .into(binding.ivPoster)
 
 
             //Open Bottom Sheet
-            binding.root.setOnClickListener{
-                if(searchMovieDto.imdbID == null){
-                    movieClickListener.onMovieClicked(title = searchMovieDto.title!!)
-                }else {
-                    movieClickListener.onMovieClicked(
-                        searchMovieDto.imdbID,
-                        searchMovieDto.type!!
-                    )
-                }
+            binding.root.setOnClickListener {
+                movieClickListener.onMovieClicked(movie)
             }
         }
 
-        companion object{
-            fun create(binding: CardMovieBinding, movieClickListener: MovieClickListener): CardMovieViewHolder{
+        companion object {
+            fun create(
+                binding: CardMovieBinding,
+                movieClickListener: MovieClickListener
+            ): CardMovieViewHolder {
                 return CardMovieViewHolder(binding, movieClickListener)
             }
         }
     }
 
-    interface MovieClickListener{
-        fun onMovieClicked(imdbID: String? = null, title: String? = null , type: String? = null)
+    interface MovieClickListener {
+        fun onMovieClicked(movie: Movie)
     }
 
-    class CardMovieDiffUtil: DiffUtil.ItemCallback<SearchMovieDto>(){
-        override fun areItemsTheSame(oldItem: SearchMovieDto, newItem: SearchMovieDto): Boolean {
+    class CardMovieDiffUtil : DiffUtil.ItemCallback<Movie>() {
+        override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean {
             return oldItem == newItem
         }
 
-        override fun areContentsTheSame(oldItem: SearchMovieDto, newItem: SearchMovieDto): Boolean {
+        override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean {
             return oldItem.imdbID == newItem.imdbID &&
                     oldItem.title == newItem.title
         }

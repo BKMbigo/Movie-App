@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bkmbigo.movieapp.R
-import com.bkmbigo.movieapp.api.dto.ParticularMovieDto
 import com.bkmbigo.movieapp.databinding.BottomSheetMovieBinding
+import com.bkmbigo.movieapp.domain.model.Movie
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class MovieBottomSheetAdapter(
-    private val particularMovieDto: ParticularMovieDto,
+    private val movie: Movie,
 ): BottomSheetDialogFragment() {
 
     private var _binding: BottomSheetMovieBinding? = null
@@ -30,17 +30,18 @@ class MovieBottomSheetAdapter(
     }
 
     private fun bindMovie(){
-        binding.tvTitle.text = particularMovieDto.title
-        binding.tvActors.text = binding.root.context.getString(R.string.label_actors_value, particularMovieDto.actors)
-        binding.tvPlot.text = particularMovieDto.plot
+        binding.tvTitle.text = movie.title
+        binding.tvActors.text = binding.root.context.getString(R.string.label_actors_value, movie.actors.joinToString())
+        binding.tvPlot.text = movie.plot
 
         Glide.with(binding.root.context)
-            .load(particularMovieDto.poster)
+            .load(movie.posterURL)
             .into(binding.ivPoster)
 
-        binding.chipType.text = particularMovieDto.type
+        binding.chipType.text = movie.type.name
 
         //Add Genre Chips
+
 
         //set Action For Adding to Favorite
 

@@ -1,5 +1,6 @@
 package com.bkmbigo.movieapp.ui.main
 
+import android.net.Uri
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
@@ -10,10 +11,12 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.bkmbigo.movieapp.R
 import com.bkmbigo.movieapp.databinding.ActivityMainBinding
+import com.bkmbigo.movieapp.ui.main.search.SearchFragment
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -29,6 +32,8 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
+        handleDeepLinkIntent()
+
         val navView: NavigationView = binding.navView
         val navHostController = supportFragmentManager.findFragmentById(binding.contentMain.navHostFragmentContentMain.id) as NavHostFragment
 
@@ -39,6 +44,10 @@ class MainActivity : AppCompatActivity() {
             binding.root)
         setupActionBarWithNavController(navHostController.navController, appBarConfiguration)
         navView.setupWithNavController(navHostController.navController)
+
+    }
+
+    private fun handleDeepLinkIntent(){
 
     }
 
@@ -63,4 +72,5 @@ class MainActivity : AppCompatActivity() {
         return navHostController.navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
     }
+
 }

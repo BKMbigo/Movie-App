@@ -1,125 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.main.search.SearchFragment">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/til_search"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:hint="@string/label_search_..."
-        app:startIconDrawable="@drawable/ic_search"
-        app:endIconMode="clear_text"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_search"
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_search"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:inputType="text"/>
-    </com.google.android.material.textfield.TextInputLayout>
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_chips"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/til_search">
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chip_group"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:singleLine="true"
-            app:singleSelection="true"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:hint="@string/label_search_..."
+            android:padding="8dp"
+            app:endIconMode="clear_text"
+            app:layout_constraintTop_toTopOf="parent"
+            app:startIconDrawable="@drawable/ic_search">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_movie"
-                style="@style/Widget.Material3.Chip.Filter.Elevated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_movie"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_series"
-                style="@style/Widget.Material3.Chip.Filter.Elevated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_series"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_episode"
-                style="@style/Widget.Material3.Chip.Filter.Elevated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_episode"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_game"
-                style="@style/Widget.Material3.Chip.Filter.Elevated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_game"/>
-        </com.google.android.material.chip.ChipGroup>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/srl"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/cl_chips">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_search"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                app:spanCount="2"
-                tools:listitem="@layout/card_movie"
-                android:visibility="visible"/>
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-            <RelativeLayout
-                android:id="@+id/rl_none"
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_chips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/til_search">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:visibility="gone">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:singleLine="true"
+                app:singleSelection="true">
 
-                <ImageView
-                    android:id="@+id/iv_poster"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_movie"
-                    android:layout_centerHorizontal="true"
-                    android:contentDescription="@string/label_movie"/>
-
-                <TextView
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_movie"
+                    style="@style/Widget.Material3.Chip.Filter.Elevated"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/label_search_none"
-                    android:layout_below="@id/iv_poster"
-                    android:textAlignment="center"
-                    android:textSize="16sp"
-                    android:textStyle="italic"/>
-            </RelativeLayout>
+                    android:text="@string/label_movie" />
 
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_series"
+                    style="@style/Widget.Material3.Chip.Filter.Elevated"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_series" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_episode"
+                    style="@style/Widget.Material3.Chip.Filter.Elevated"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_episode" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_game"
+                    style="@style/Widget.Material3.Chip.Filter.Elevated"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_game" />
+            </com.google.android.material.chip.ChipGroup>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</RelativeLayout>
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/srl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cl_chips">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:visibility="visible"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="2"
+                    tools:listitem="@layout/card_movie" />
+
+                <RelativeLayout
+                    android:id="@+id/rl_none"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/iv_poster"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_centerHorizontal="true"
+                        android:contentDescription="@string/label_movie"
+                        android:src="@drawable/ic_movie" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/iv_poster"
+                        android:text="@string/label_search_none"
+                        android:textAlignment="center"
+                        android:textSize="16sp"
+                        android:textStyle="italic" />
+                </RelativeLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    </RelativeLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

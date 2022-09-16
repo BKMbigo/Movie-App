@@ -10,3 +10,20 @@ data class SearchResultsDto(
     @SerializedName("Response")
     val response: String
 )
+
+data class SearchMovieDto(
+    @SerializedName("Title")
+    val title: String?,
+
+    @SerializedName("Year")
+    val year: String?,
+
+    @SerializedName("imdbID")
+    val imdbID: String?,
+
+    @SerializedName("Type")
+    val type: String?,
+
+    @SerializedName("Poster")
+    val posterURL: String?
+)

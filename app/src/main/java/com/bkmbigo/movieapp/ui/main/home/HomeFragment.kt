@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.bkmbigo.movieapp.R
 import com.bkmbigo.movieapp.databinding.FragmentHomeBinding
 
 class HomeFragment: Fragment() {

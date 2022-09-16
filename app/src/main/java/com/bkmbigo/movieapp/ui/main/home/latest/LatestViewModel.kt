@@ -4,8 +4,13 @@ import androidx.lifecycle.*
 import com.bkmbigo.movieapp.api.PSAripsAPI
 import com.bkmbigo.movieapp.api.dto.PSAripsFeed
 import com.bkmbigo.movieapp.api.dto.PSAItem
+import com.bkmbigo.movieapp.domain.model.Movie
+import com.bkmbigo.movieapp.domain.repository.MovieRepository
+import com.bkmbigo.movieapp.utils.WebApiCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -14,47 +19,34 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class LatestViewModel(
-    private val psaripsAPI: PSAripsAPI
-): ViewModel() {
+    private val movieRepository: MovieRepository
+): ViewModel()  {
 
-    private val _latestResults = MutableLiveData<List<PSAItem?>>()
-    val latestResults: LiveData<List<PSAItem?>> = _latestResults
+    private val _latestResults = MutableLiveData<List<Movie>>()
+    val latestResults: LiveData<List<Movie>> = _latestResults
 
     private val _errorMessage = Channel<String>()
     val errorMessage get() = _errorMessage.receiveAsFlow()
 
+    private val _loading = MutableStateFlow(false)
+    fun changeLoading(loading: Boolean){_loading.value = loading}
+    val loading: StateFlow<Boolean> get() = _loading
+
+    private val psaCallback = object: WebApiCallback<List<Movie>>{
+        override fun onFailure(e: Exception?) {
+            _errorMessage.trySend(e?.message?:"Error Encountered")
+        }
+
+        override fun onResponse(data: List<Movie>) {
+            _latestResults.value = data
+            _loading.value = false
+        }
+
+    }
+
     suspend fun getLatestResults(){
         withContext(Dispatchers.IO){
-            val call = psaripsAPI.getPSAripsFeed()
-            call.enqueue(object : Callback<PSAripsFeed>{
-                override fun onResponse(call: Call<PSAripsFeed>, response: Response<PSAripsFeed>) {
-//                    try {
-                        if (response.body() != null) {
-                            val feed = response.body()
-                            val items = feed!!.channel.items
-
-                            val list = ArrayList<PSAItem>()
-                            items.forEach {
-                                val _item = PSAItem(it.title, it.link, it.description, it.category)
-                                list.add(_item)
-                            }
-
-                            _latestResults.value = list
-                        }
-//                    }catch(e: Exception){
-//                        viewModelScope.launch {
-//                            _errorMessage.send(e.message!!)
-//                        }
-//                    }
-                }
-
-                override fun onFailure(call: Call<PSAripsFeed>, t: Throwable) {
-                    viewModelScope.launch {
-                        _errorMessage.send(t.message!!)
-                    }
-                }
-
-            })
+            movieRepository.getLatest(MovieRepository.Companion.LatestMovieSite.PSArips, psaCallback)
         }
     }
 
@@ -65,8 +57,8 @@ class LatestViewModel(
     }
 
 
-    class LatestViewModelFactory(private val psaripsAPI: PSAripsAPI): ViewModelProvider.NewInstanceFactory(){
+    class LatestViewModelFactory(private val movieRepository: MovieRepository): ViewModelProvider.NewInstanceFactory(){
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T = LatestViewModel(psaripsAPI) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = LatestViewModel(movieRepository) as T
     }
 }

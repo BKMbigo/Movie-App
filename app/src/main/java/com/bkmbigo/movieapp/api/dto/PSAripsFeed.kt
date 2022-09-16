@@ -30,6 +30,6 @@ data class PSAItem @JvmOverloads constructor(
     var link: String = "",
     @field:Element(name="description")
     var description: String = "",
-    @field:ElementList(name = "category", inline = true, required = false)
+    @field:ElementList(name = "category", entry = "category", inline = true, required = false)
     var category: List<String> = ArrayList()
 )

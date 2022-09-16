@@ -17,6 +17,13 @@
         android:label="@string/label_search"
         tools:layout="@layout/fragment_search">
 
+        <argument
+            android:name="title"
+            android:defaultValue=""/>
+
+        <deepLink
+            app:uri="movie-app://com.bkmbigo.movieapp/search?title={title}"/>
+
     </fragment>
 
 </navigation>

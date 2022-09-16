@@ -13,9 +13,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.bkmbigo.movieapp.R
 import com.bkmbigo.movieapp.api.OmdbApi
 import com.bkmbigo.movieapp.api.dto.ParticularMovieDto
+import com.bkmbigo.movieapp.data.mapper.toMovie
+import com.bkmbigo.movieapp.data.repository.MovieRepositoryImpl
 import com.bkmbigo.movieapp.databinding.FragmentSearchBinding
+import com.bkmbigo.movieapp.domain.model.Movie
+import com.bkmbigo.movieapp.domain.repository.MovieRepository
 import com.bkmbigo.movieapp.ui.adapter.CardMovieAdapter
 import com.bkmbigo.movieapp.ui.adapter.MovieBottomSheetAdapter
+import com.bkmbigo.movieapp.utils.WebApiCallback
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -39,7 +45,7 @@ class SearchFragment : Fragment(), CardMovieAdapter.MovieClickListener {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
         val _searchViewModel by viewModels<SearchViewModel> {
-            SearchViewModel.HomeViewModelFactory(getString(R.string.omdb_api_key), OmdbApi.getClient())
+            SearchViewModel.HomeViewModelFactory(MovieRepositoryImpl(getString(R.string.omdb_api_key)))
         }
         searchViewModel = _searchViewModel
 
@@ -107,6 +113,8 @@ class SearchFragment : Fragment(), CardMovieAdapter.MovieClickListener {
         }
     }
 
+    fun onError(message: String) = Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+
 
 
     override fun onDestroyView() {
@@ -114,25 +122,34 @@ class SearchFragment : Fragment(), CardMovieAdapter.MovieClickListener {
         _binding = null
     }
 
-    override fun onMovieClicked(imdbID: String?, title: String?, type: String?) {
-        searchViewModel.changeLoading(true)
-        val call = OmdbApi.getClient().getParticularMovie(getString(R.string.omdb_api_key), imdbID!!, type)
-        call.enqueue(object: Callback<ParticularMovieDto>{
-            override fun onResponse(
-                call: Call<ParticularMovieDto>,
-                response: Response<ParticularMovieDto>
-            ) {
-                val movieBottomSheetAdapter = response.body()?.let { MovieBottomSheetAdapter(it) }
-                movieBottomSheetAdapter?.show(requireActivity().supportFragmentManager, MovieBottomSheetAdapter.TAG)
-                searchViewModel.changeLoading(false)
+    override fun onMovieClicked(movie: Movie) {
+        if(movie.imdbID != null){
+            searchViewModel.changeLoading(true)
+            lifecycleScope.launch(Dispatchers.IO) {
+                val callback = object: WebApiCallback<Movie>{
+                    override fun onResponse(data: Movie) {
+                        searchViewModel.changeLoading(false)
+                        val movieBottomSheetAdapter = MovieBottomSheetAdapter(data)
+                        movieBottomSheetAdapter.show(requireActivity().supportFragmentManager, MovieBottomSheetAdapter.TAG)
+                    }
+
+                    override fun onFailure(e: Exception?) {
+                        searchViewModel.changeLoading(false)
+                        onError(e?.message?:"Error parsing response from API")
+                    }
+
+                }
+                searchViewModel.getParticularMovie(movie, callback)
             }
-
-            override fun onFailure(call: Call<ParticularMovieDto>, t: Throwable) {
-                TODO("Not yet implemented")
-            }
-
-        })
+        } else {
+            binding.etSearch.setText(movie.title)
+        }
+    }
 
 
+
+
+    companion object{
+        const val SEARCH_TITLE_KEY = "com.bkmbigo.movieapp.ui.search.searchkey"
     }
 }

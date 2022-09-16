@@ -1,69 +1,79 @@
 package com.bkmbigo.movieapp.ui.main.search
 
 import androidx.lifecycle.*
-import com.bkmbigo.movieapp.api.OmdbApi
-import com.bkmbigo.movieapp.api.dto.SearchMovieDto
-import com.bkmbigo.movieapp.api.dto.SearchResultsDto
+import com.bkmbigo.movieapp.domain.model.Movie
+import com.bkmbigo.movieapp.domain.repository.MovieRepository
+import com.bkmbigo.movieapp.utils.WebApiCallback
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class SearchViewModel(
-    private val omdbApiKey: String,
-    private val omdbApi: OmdbApi
+    private val movieRepository: MovieRepository,
 ) : ViewModel() {
 
-    private val _movieResults = MutableLiveData<List<SearchMovieDto>>()
-    val movieResults: LiveData<List<SearchMovieDto>> = _movieResults
+    private val _movieResults = MutableLiveData<List<Movie>>()
+    val movieResults: LiveData<List<Movie>> = _movieResults
 
     private val _loading = MutableStateFlow(false)
-    fun changeLoading(loading: Boolean){_loading.value = loading}
+    fun changeLoading(loading: Boolean) {
+        _loading.value = loading
+    }
+
     val loading: StateFlow<Boolean> = _loading
 
+    private val _error = Channel<String>()
+    val error = _error.receiveAsFlow()
+
+
+    val callbackMovie = object : WebApiCallback<List<Movie>> {
+        override fun onResponse(data: List<Movie>) {
+            _movieResults.value = data
+            _loading.value = false
+        }
+
+        override fun onFailure(e: Exception?) {
+            _error.trySend("Failed to get list of movies")
+            _loading.value = false
+        }
+
+    }
+
     suspend fun searchMovies(query: String, type: String) {
+        if (query.isEmpty()) {
+            _error.send("Query is empty")
+        }
         _loading.value = true
         withContext(Dispatchers.IO) {
-            val call = omdbApi.searchMovie(omdbApiKey, query, type)
-            call.enqueue(object : Callback<SearchResultsDto> {
-                override fun onResponse(
-                    call: Call<SearchResultsDto>,
-                    response: Response<SearchResultsDto>
-                ) {
-                    if(response.body() != null) {
-                        response.body()!!.search.let {
-                            _movieResults.value = it
-                        }
-                    }
-                    _loading.value = false
-                }
-
-                override fun onFailure(call: Call<SearchResultsDto>, t: Throwable) {
-                    _loading.value = false
-                    //TODO("Not yet implemented")
-                }
-
-
-            })
+            movieRepository.searchMovie(query, type, callbackMovie)
         }
+    }
+
+    suspend fun getParticularMovie(movie: Movie, callback: WebApiCallback<Movie>) {
+
+            if (movie.imdbID == null) {
+                _error.trySend("Movie does not have an IMDB ID")
+            } else {
+                movieRepository.getMovieParticulars(movie, callback)
+            }
+
     }
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            searchMovies("thor", "null")
+            searchMovies("thor", "movie")
         }
     }
 
     class HomeViewModelFactory(
-        private val omdbApiKey: String,
-        private val omdbApi: OmdbApi
+        private val movieRepository: MovieRepository
     ) : ViewModelProvider.NewInstanceFactory() {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            SearchViewModel(omdbApiKey, omdbApi) as T
+            SearchViewModel(movieRepository) as T
     }
 }
