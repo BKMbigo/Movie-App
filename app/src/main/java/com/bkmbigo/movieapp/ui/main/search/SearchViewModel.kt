@@ -54,13 +54,11 @@ class SearchViewModel(
     }
 
     suspend fun getParticularMovie(movie: Movie, callback: WebApiCallback<Movie>) {
-
-            if (movie.imdbID == null) {
-                _error.trySend("Movie does not have an IMDB ID")
-            } else {
-                movieRepository.getMovieParticulars(movie, callback)
-            }
-
+        if (movie.imdbID == null) {
+            _error.trySend("Movie does not have an IMDB ID")
+        } else {
+            movieRepository.getMovieParticulars(movie, callback)
+        }
     }
 
     init {

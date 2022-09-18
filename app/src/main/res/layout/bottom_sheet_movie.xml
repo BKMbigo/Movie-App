@@ -10,14 +10,26 @@
         android:id="@+id/cl_actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showAnimationBehavior="inward"
+            app:hideAnimationBehavior="outward"
+            android:visibility="gone"
+            android:indeterminate="true"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/bt_bookmark"
             style="@style/Widget.Material3.Button.IconButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_no_bookmark"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/progress_horizontal"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:ignore="RelativeOverlap" />
 
         <com.google.android.material.button.MaterialButton
@@ -26,6 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_no_favorite"
+            app:layout_constraintBottom_toTopOf="@id/progress_horizontal"
             app:layout_constraintEnd_toStartOf="@id/bt_bookmark"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="RelativeOverlap" />
@@ -36,39 +49,39 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_share"
+            app:layout_constraintBottom_toTopOf="@id/progress_horizontal"
             app:layout_constraintEnd_toStartOf="@id/bt_favorite"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="RelativeOverlap" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_download_list"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_download_list"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/chip_watch_list"/>
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_download_list"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_download_list"
+            app:layout_constraintEnd_toStartOf="@id/chip_watch_list"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_watch_list"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_watch_list"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/chip_download_list"
-                app:layout_constraintEnd_toStartOf="@id/bt_share"/>
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_watch_list"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_watch_list"
+            app:layout_constraintEnd_toStartOf="@id/bt_share"
+            app:layout_constraintStart_toEndOf="@id/chip_download_list"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 
     <ImageView
         android:id="@+id/iv_poster"
         android:layout_width="150dp"
         android:layout_height="210dp"
-        android:layout_margin="8dp"
         android:layout_below="@id/cl_actions"
+        android:layout_margin="8dp"
         android:contentDescription="@string/label_movie" />
 
     <View
@@ -135,8 +148,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_actors"
-        android:layout_toEndOf="@id/iv_poster"
         android:layout_marginEnd="4dp"
+        android:layout_toEndOf="@id/iv_poster"
         android:ellipsize="end"
         android:lines="4"
         android:maxLines="5"
@@ -148,8 +161,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/iv_poster"
-        android:layout_alignBottom="@id/iv_poster">
+        android:layout_alignBottom="@id/iv_poster"
+        android:layout_toEndOf="@id/iv_poster">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/bt_more_info"
@@ -158,9 +171,9 @@
             android:layout_height="wrap_content"
             android:text="@string/label_more_info"
             app:icon="@drawable/ic_info"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

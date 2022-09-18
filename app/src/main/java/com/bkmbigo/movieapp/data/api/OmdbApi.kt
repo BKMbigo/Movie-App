@@ -1,8 +1,7 @@
-package com.bkmbigo.movieapp.api
+package com.bkmbigo.movieapp.data.api
 
-import com.bkmbigo.movieapp.api.dto.ParticularMovieDto
-import com.bkmbigo.movieapp.api.dto.SearchMovieDto
-import com.bkmbigo.movieapp.api.dto.SearchResultsDto
+import com.bkmbigo.movieapp.data.dto.ParticularMovieDto
+import com.bkmbigo.movieapp.data.dto.SearchResultsDto
 import retrofit2.http.GET
 import retrofit2.Call
 import retrofit2.Retrofit

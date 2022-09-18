@@ -11,24 +11,18 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bkmbigo.movieapp.R
-import com.bkmbigo.movieapp.api.OmdbApi
-import com.bkmbigo.movieapp.api.dto.ParticularMovieDto
-import com.bkmbigo.movieapp.data.mapper.toMovie
 import com.bkmbigo.movieapp.data.repository.MovieRepositoryImpl
 import com.bkmbigo.movieapp.databinding.FragmentSearchBinding
 import com.bkmbigo.movieapp.domain.model.Movie
-import com.bkmbigo.movieapp.domain.repository.MovieRepository
 import com.bkmbigo.movieapp.ui.adapter.CardMovieAdapter
-import com.bkmbigo.movieapp.ui.adapter.MovieBottomSheetAdapter
+import com.bkmbigo.movieapp.ui.adapter.moviebottomsheet.MovieBottomSheetAdapter
 import com.bkmbigo.movieapp.utils.WebApiCallback
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 
-class SearchFragment : Fragment(), CardMovieAdapter.MovieClickListener {
+class SearchFragment
+    : Fragment(), CardMovieAdapter.MovieClickListener{
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!

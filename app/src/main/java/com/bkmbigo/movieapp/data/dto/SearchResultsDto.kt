@@ -1,4 +1,4 @@
-package com.bkmbigo.movieapp.api.dto
+package com.bkmbigo.movieapp.data.dto
 
 import com.google.gson.annotations.SerializedName
 

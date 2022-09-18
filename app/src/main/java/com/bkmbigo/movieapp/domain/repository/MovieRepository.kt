@@ -1,10 +1,8 @@
 package com.bkmbigo.movieapp.domain.repository
 
 import com.bkmbigo.movieapp.domain.model.Movie
-import com.bkmbigo.movieapp.utils.FirebaseReadCallback
-import com.bkmbigo.movieapp.utils.FirebaseWriteCallback
+import com.bkmbigo.movieapp.utils.FirebaseCallback
 import com.bkmbigo.movieapp.utils.WebApiCallback
-import retrofit2.Call
 
 interface MovieRepository {
 
@@ -14,25 +12,19 @@ interface MovieRepository {
 
     suspend fun getMovieParticulars(movie: Movie, callback: WebApiCallback<Movie>)
 
-    suspend fun getWatchList(callback: FirebaseReadCallback<List<Movie>>)
-    suspend fun getDownloadList(callback: FirebaseReadCallback<List<Movie>>)
+    suspend fun getWatchList(callback: FirebaseCallback<List<Movie>>)
+    suspend fun getDownloadList(callback: FirebaseCallback<List<Movie>>)
+    suspend fun getBookmarked(callback: FirebaseCallback<List<Movie>>)
+    suspend fun getFavorites(callback: FirebaseCallback<List<Movie>>)
 
-    suspend fun addToDownloadList(imdbID: String, callback: FirebaseWriteCallback)
-    suspend fun removeFromDownloadList(imdbID: String, callback: FirebaseWriteCallback)
-
-    suspend fun addToWatchList(imdbID: String, callback: FirebaseWriteCallback)
-    suspend fun removeFromWatchList(imdbID: String, callback: FirebaseWriteCallback)
-
-    suspend fun addBookmarked(imdbID: String, callback: FirebaseWriteCallback)
-    suspend fun removeBookmark(imdbID: String, callback: FirebaseWriteCallback)
-
-    suspend fun addFavorite(imdbID: String, callback: FirebaseWriteCallback)
-    suspend fun removeFavorite(imdbID: String, callback: FirebaseWriteCallback)
+    suspend fun toggleDownloadList(movie: Movie, callback: FirebaseCallback<Movie>)
+    suspend fun toggleWatchList(movie: Movie, callback: FirebaseCallback<Movie>)
+    suspend fun toggleBookmarked(movie: Movie, callback: FirebaseCallback<Movie>)
+    suspend fun toggleFavorite(movie: Movie, callback: FirebaseCallback<Movie>)
 
     companion object{
         enum class LatestMovieSite{
-            PSArips,
-            Pahe
+            PSArips
         }
     }
 }

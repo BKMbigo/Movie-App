@@ -1,8 +1,8 @@
 package com.bkmbigo.movieapp.data.mapper
 
-import com.bkmbigo.movieapp.api.dto.PSAItem
-import com.bkmbigo.movieapp.api.dto.ParticularMovieDto
-import com.bkmbigo.movieapp.api.dto.SearchMovieDto
+import com.bkmbigo.movieapp.data.dto.PSAItem
+import com.bkmbigo.movieapp.data.dto.ParticularMovieDto
+import com.bkmbigo.movieapp.data.dto.SearchMovieDto
 import com.bkmbigo.movieapp.domain.model.Film
 import com.bkmbigo.movieapp.domain.model.Game
 import com.bkmbigo.movieapp.domain.model.Movie
@@ -42,7 +42,6 @@ fun ParticularMovieDto.toMovie(): Movie{
         else -> throw IllegalStateException()
     }
 }
-
 fun ParticularMovieDto.toFilm() : Film{
     if(type?.lowercase() != "movie"){
         throw IllegalStateException("Cannot cast $type to Movie")

@@ -13,6 +13,7 @@
     <!--  Home Fragment  -->
     <!--  Latest Fragment  -->
     <string name="label_psarips">PSArips</string>
+    <string name="label_pahe">Pahe</string>
 
     <!--  List Strings  -->
     <string name="label_grid">Grid</string>

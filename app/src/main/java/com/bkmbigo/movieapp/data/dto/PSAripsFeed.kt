@@ -1,4 +1,4 @@
-package com.bkmbigo.movieapp.api.dto
+package com.bkmbigo.movieapp.data.dto
 
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.ElementList

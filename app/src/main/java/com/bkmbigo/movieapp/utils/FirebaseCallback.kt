@@ -1,6 +1,6 @@
 package com.bkmbigo.movieapp.utils
 
-interface FirebaseReadCallback<A> {
+interface FirebaseCallback<A> {
     fun onSuccess(data:A)
     fun onError(e: Exception)
 }

@@ -42,7 +42,7 @@ data class Film(
     override var imdbID: String? = null,
     override var title: String,
     override var plot: String? = null,
-    override var type: MovieType,
+    override var type: MovieType = MovieType.Movie,
     override var genres: List<String> = ArrayList(),
     //override var producer: List<String>,
     override var writers: List<String> = ArrayList(),

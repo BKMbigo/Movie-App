@@ -1,9 +1,8 @@
-package com.bkmbigo.movieapp.api
+package com.bkmbigo.movieapp.data.api
 
-import com.bkmbigo.movieapp.api.dto.PSAripsFeed
+import com.bkmbigo.movieapp.data.dto.PSAripsFeed
 import retrofit2.Call
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory
 import retrofit2.http.GET
 
