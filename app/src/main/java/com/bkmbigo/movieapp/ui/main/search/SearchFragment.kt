@@ -144,8 +144,6 @@ class SearchFragment
     }
 
 
-
-
     companion object{
         const val SEARCH_TITLE_KEY = "com.bkmbigo.movieapp.ui.search.searchkey"
     }

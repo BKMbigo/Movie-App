@@ -41,6 +41,7 @@ class WatchListViewModel(
             watchListSize = data.size
             if(data.isEmpty()){
                 _loading.value = false
+                _watchList.value = emptyList()
                 _error.trySend("Empty Watch List")
             }else {
                 viewModelScope.launch {
@@ -65,7 +66,7 @@ class WatchListViewModel(
         _loading.value = true
 
         withContext(Dispatchers.IO){
-            movieRepository.getWatchList(watchCallback, getStateName())
+            movieRepository.getWatchList(watchCallback, getStateName(), true)
         }
 
     }

@@ -29,10 +29,7 @@ class MovieRepositoryImpl(
     private val databaseReference: DatabaseReference? = null,
 ): MovieRepository {
 
-    override suspend fun getLatest(
-        site: MovieRepository.Companion.LatestMovieSite,
-        callback: WebApiCallback<List<Movie>>
-    ) {
+    override suspend fun getLatest(site: MovieRepository.Companion.LatestMovieSite, callback: WebApiCallback<List<Movie>>) {
         if(site == MovieRepository.Companion.LatestMovieSite.PSArips) {
 
             val call = PSAripsAPI.getClient().getPSAripsFeed()
@@ -220,6 +217,7 @@ class MovieRepositoryImpl(
                     return
                 }
                 numberCompleted = 0
+
                 callback.onSuccess(movies)
             }
 
@@ -254,10 +252,10 @@ class MovieRepositoryImpl(
         }
 
         withContext(Dispatchers.IO){
-            val watch = async { getWatchList(watchCallback) }
-            val download = async { getDownloadList(downloadCallback) }
-            val bookmark = async { getBookmarked(bookmarkCallback) }
-            val favorite = async { getFavorites(favoriteCallback) }
+            val watch = async { getWatchList(watchCallback, retainObserver = false) }
+            val download = async { getDownloadList(downloadCallback, retainObserver = false) }
+            val bookmark = async { getBookmarked(bookmarkCallback, retainObserver = false) }
+            val favorite = async { getFavorites(favoriteCallback, retainObserver = false) }
         }
 
     }
@@ -272,7 +270,8 @@ class MovieRepositoryImpl(
     //Firebase
     override suspend fun getWatchList(
         callback: FirebaseCallback<List<String>>,
-        type: Movie.MovieType?
+        type: Movie.MovieType?,
+        retainObserver: Boolean
     ) {
         if(databaseReference == null){
             callback.onError(IllegalStateException("Database Reference is null"))
@@ -296,95 +295,252 @@ class MovieRepositoryImpl(
             null -> databaseReference.child("movie").child("watch")
         }
 
+        if(retainObserver) {
+            val valueEventListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val resultList = ArrayList<String>()
+                    val list = snapshot.children.map {
+                        it.key
+                    }
+                    list.forEach { imdbID ->
+                        if (imdbID != null) {
+                            resultList.add(imdbID)
+                        }
+                    }
 
-
-
-        val valueEventListener= object: ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val resultList = ArrayList<String>()
-                val list = snapshot.children.map{
-                    it.key
+                    callback.onSuccess(resultList)
                 }
-                list.forEach { imdbID -> if(imdbID != null) { resultList.add(imdbID) } }
 
-                callback.onSuccess(resultList)
+                override fun onCancelled(error: DatabaseError) {
+                    callback.onError(error.toException())
+                }
             }
+            watchReference.addValueEventListener(valueEventListener)
+        }else{
+            watchReference.get().addOnCompleteListener { task ->
+                if(task.isSuccessful){
+                    val resultList = ArrayList<String>()
+                    val snapshot = task.result
+                    val list = snapshot.children.map {
+                        it.key
+                    }
+                    list.forEach { imdbID ->
+                        if (imdbID != null) {
+                            resultList.add(imdbID)
+                        }
+                    }
 
-            override fun onCancelled(error: DatabaseError) { callback.onError(error.toException()) }
+                    callback.onSuccess(resultList)
+                }else{
+                    task.exception?.let { callback.onError(it) }
+                }
+            }
         }
-        watchReference.addValueEventListener(valueEventListener)
     }
-    override suspend fun getDownloadList(callback: FirebaseCallback<List<String>>) {
+    override suspend fun getDownloadList(
+        callback: FirebaseCallback<List<String>>,
+        type: Movie.MovieType?,
+        retainObserver: Boolean
+    ) {
         if(databaseReference == null){
             callback.onError(IllegalStateException("Database Reference is null"))
             return
         }
 
-        val downloadReference: DatabaseReference =
-            databaseReference.child("movie").child("download")
-
-        val valueEventListener= object: ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val resultList = ArrayList<String>()
-                val list = snapshot.children.map{
-                    it.key
-                }
-                list.forEach { movie -> if(movie != null) { resultList.add(movie) } }
-
-                callback.onSuccess(resultList)
-            }
-
-            override fun onCancelled(error: DatabaseError) { callback.onError(error.toException()) }
+        val downloadReference: Query = when(type){
+            null -> databaseReference.child("movie").child("download")
+            Movie.MovieType.Movie ->
+                databaseReference.child("movie").child("download")
+                    .orderByChild("type").equalTo(Movie.MovieType.Movie.name)
+            Movie.MovieType.Series ->
+                databaseReference.child("movie").child("download")
+                    .orderByChild("type").equalTo(Movie.MovieType.Series.name)
+            Movie.MovieType.Episode ->
+                databaseReference.child("movie").child("download")
+                    .orderByChild("type").equalTo(Movie.MovieType.Episode.name)
+            Movie.MovieType.Game ->
+                databaseReference.child("movie").child("download")
+                    .orderByChild("type").equalTo(Movie.MovieType.Game.name)
         }
-        downloadReference.addValueEventListener(valueEventListener)
+
+        if(retainObserver) {
+
+            val valueEventListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val resultList = ArrayList<String>()
+                    val list = snapshot.children.map {
+                        it.key
+                    }
+                    list.forEach { movie ->
+                        if (movie != null) {
+                            resultList.add(movie)
+                        }
+                    }
+
+                    callback.onSuccess(resultList)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    callback.onError(error.toException())
+                }
+            }
+            downloadReference.addValueEventListener(valueEventListener)
+        }else{
+            downloadReference.get().addOnCompleteListener { task ->
+                if(task.isSuccessful){
+                    val resultList = ArrayList<String>()
+                    val snapshot = task.result
+                    val list = snapshot.children.map {
+                        it.key
+                    }
+                    list.forEach { imdbID ->
+                        if (imdbID != null) {
+                            resultList.add(imdbID)
+                        }
+                    }
+
+                    callback.onSuccess(resultList)
+                }else{
+                    task.exception?.let { callback.onError(it) }
+                }
+            }
+        }
     }
-    override suspend fun getBookmarked(callback: FirebaseCallback<List<String>>) {
+    override suspend fun getBookmarked(
+        callback: FirebaseCallback<List<String>>,
+        type: Movie.MovieType?,
+        retainObserver: Boolean
+    ) {
         if(databaseReference == null){
             callback.onError(IllegalStateException("Database Reference is null"))
             return
         }
 
-        val bookmarkedReference: DatabaseReference =
-            databaseReference.child("movie").child("bookmark")
-
-        val valueEventListener= object: ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val resultList = ArrayList<String>()
-                val list = snapshot.children.map{
-                    it.key
-                }
-                list.forEach { movie -> if(movie != null) { resultList.add(movie) } }
-
-                callback.onSuccess(resultList)
-            }
-
-            override fun onCancelled(error: DatabaseError) { callback.onError(error.toException()) }
+        val bookmarkedReference: Query = when(type) {
+            null -> databaseReference.child("movie").child("bookmark")
+            Movie.MovieType.Movie ->
+                databaseReference.child("movie").child("bookmark")
+                    .orderByChild("type").equalTo(Movie.MovieType.Movie.name)
+            Movie.MovieType.Series ->
+                databaseReference.child("movie").child("bookmark")
+                    .orderByChild("type").equalTo(Movie.MovieType.Series.name)
+            Movie.MovieType.Episode ->
+                databaseReference.child("movie").child("bookmark")
+                    .orderByChild("type").equalTo(Movie.MovieType.Episode.name)
+            Movie.MovieType.Game ->
+                databaseReference.child("movie").child("bookmark")
+                    .orderByChild("type").equalTo(Movie.MovieType.Game.name)
         }
-        bookmarkedReference.addValueEventListener(valueEventListener)
+
+        if(retainObserver) {
+            val valueEventListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val resultList = ArrayList<String>()
+                    val list = snapshot.children.map {
+                        it.key
+                    }
+                    list.forEach { movie ->
+                        if (movie != null) {
+                            resultList.add(movie)
+                        }
+                    }
+
+                    callback.onSuccess(resultList)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    callback.onError(error.toException())
+                }
+            }
+            bookmarkedReference.addValueEventListener(valueEventListener)
+        } else {
+            bookmarkedReference.get().addOnCompleteListener { task ->
+                if(task.isSuccessful){
+                    val resultList = ArrayList<String>()
+                    val snapshot = task.result
+                    val list = snapshot.children.map {
+                        it.key
+                    }
+                    list.forEach { imdbID ->
+                        if (imdbID != null) {
+                            resultList.add(imdbID)
+                        }
+                    }
+
+                    callback.onSuccess(resultList)
+                }else{
+                    task.exception?.let { callback.onError(it) }
+                }
+            }
+        }
     }
-    override suspend fun getFavorites(callback: FirebaseCallback<List<String>>) {
+    override suspend fun getFavorites(
+        callback: FirebaseCallback<List<String>>,
+        type: Movie.MovieType?,
+        retainObserver: Boolean
+    ) {
         if(databaseReference == null){
             callback.onError(IllegalStateException("Database Reference is null"))
             return
         }
 
-        val favoriteReference: DatabaseReference =
-            databaseReference.child("movie").child("favorite")
-
-        val valueEventListener= object: ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val resultList = ArrayList<String>()
-                val list = snapshot.children.map{
-                    it.key
-                }
-                list.forEach { movie -> if(movie != null) { resultList.add(movie) } }
-
-                callback.onSuccess(resultList)
-            }
-
-            override fun onCancelled(error: DatabaseError) { callback.onError(error.toException()) }
+        val favoriteReference: Query = when(type) {
+            null -> databaseReference.child("movie").child("favorite")
+            Movie.MovieType.Movie ->
+                databaseReference.child("movie").child("favorite")
+                    .orderByChild("type").equalTo(Movie.MovieType.Movie.name)
+            Movie.MovieType.Series ->
+                databaseReference.child("movie").child("favorite")
+                    .orderByChild("type").equalTo(Movie.MovieType.Series.name)
+            Movie.MovieType.Episode ->
+                databaseReference.child("movie").child("favorite")
+                    .orderByChild("type").equalTo(Movie.MovieType.Episode.name)
+            Movie.MovieType.Game ->
+                databaseReference.child("movie").child("favorite")
+                    .orderByChild("type").equalTo(Movie.MovieType.Game.name)
         }
-        favoriteReference.addValueEventListener(valueEventListener)
+
+        if(retainObserver) {
+            val valueEventListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val resultList = ArrayList<String>()
+                    val list = snapshot.children.map {
+                        it.key
+                    }
+                    list.forEach { movie ->
+                        if (movie != null) {
+                            resultList.add(movie)
+                        }
+                    }
+
+                    callback.onSuccess(resultList)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    callback.onError(error.toException())
+                }
+            }
+            favoriteReference.addValueEventListener(valueEventListener)
+        } else {
+            favoriteReference.get().addOnCompleteListener { task ->
+                if(task.isSuccessful){
+                    val resultList = ArrayList<String>()
+                    val snapshot = task.result
+                    val list = snapshot.children.map {
+                        it.key
+                    }
+                    list.forEach { imdbID ->
+                        if (imdbID != null) {
+                            resultList.add(imdbID)
+                        }
+                    }
+
+                    callback.onSuccess(resultList)
+                }else{
+                    task.exception?.let { callback.onError(it) }
+                }
+            }
+        }
     }
 
 
@@ -541,6 +697,4 @@ class MovieRepositoryImpl(
             }
         }
     }
-
-
 }

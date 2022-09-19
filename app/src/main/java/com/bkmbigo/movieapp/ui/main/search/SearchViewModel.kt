@@ -44,7 +44,7 @@ class SearchViewModel(
     }
 
     suspend fun searchMovies(query: String, type: String) {
-        if (query.isEmpty()) {
+        if (query.trim().isEmpty()) {
             _error.send("Query is empty")
         }
         _loading.value = true

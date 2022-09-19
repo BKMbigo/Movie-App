@@ -67,11 +67,9 @@
                 android:layout_height="match_parent"
                 tools:listitem="@layout/card_movie"
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                app:spanCount="2"/>
+                app:spanCount="4"/>
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-
     </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
