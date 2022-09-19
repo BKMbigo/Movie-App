@@ -30,7 +30,7 @@ class SearchViewModel(
     val error = _error.receiveAsFlow()
 
 
-    val callbackMovie = object : WebApiCallback<List<Movie>> {
+    private val callbackMovie = object : WebApiCallback<List<Movie>> {
         override fun onResponse(data: List<Movie>) {
             _movieResults.value = data
             _loading.value = false

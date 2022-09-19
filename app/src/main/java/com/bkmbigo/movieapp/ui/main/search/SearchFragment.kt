@@ -18,6 +18,7 @@ import com.bkmbigo.movieapp.ui.adapter.CardMovieAdapter
 import com.bkmbigo.movieapp.ui.adapter.moviebottomsheet.MovieBottomSheetAdapter
 import com.bkmbigo.movieapp.utils.WebApiCallback
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.*
 
 
@@ -38,8 +39,10 @@ class SearchFragment
     ): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
+        val  databaseReference = FirebaseDatabase.getInstance().reference
+
         val _searchViewModel by viewModels<SearchViewModel> {
-            SearchViewModel.HomeViewModelFactory(MovieRepositoryImpl(getString(R.string.omdb_api_key)))
+            SearchViewModel.HomeViewModelFactory(MovieRepositoryImpl(getString(R.string.omdb_api_key), databaseReference))
         }
         searchViewModel = _searchViewModel
 

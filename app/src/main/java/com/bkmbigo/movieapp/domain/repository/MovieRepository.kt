@@ -12,10 +12,14 @@ interface MovieRepository {
 
     suspend fun getMovieParticulars(movie: Movie, callback: WebApiCallback<Movie>)
 
-    suspend fun getWatchList(callback: FirebaseCallback<List<Movie>>)
-    suspend fun getDownloadList(callback: FirebaseCallback<List<Movie>>)
-    suspend fun getBookmarked(callback: FirebaseCallback<List<Movie>>)
-    suspend fun getFavorites(callback: FirebaseCallback<List<Movie>>)
+    suspend fun getMovies(imdbIDs: List<String>, callback: WebApiCallback<List<Movie>>)
+
+    suspend fun getMovieStatus(movies: List<Movie>, callback: FirebaseCallback<List<Movie>>)
+
+    suspend fun getWatchList(callback: FirebaseCallback<List<String>>, type: Movie.MovieType?=null)
+    suspend fun getDownloadList(callback: FirebaseCallback<List<String>>)
+    suspend fun getBookmarked(callback: FirebaseCallback<List<String>>)
+    suspend fun getFavorites(callback: FirebaseCallback<List<String>>)
 
     suspend fun toggleDownloadList(movie: Movie, callback: FirebaseCallback<Movie>)
     suspend fun toggleWatchList(movie: Movie, callback: FirebaseCallback<Movie>)

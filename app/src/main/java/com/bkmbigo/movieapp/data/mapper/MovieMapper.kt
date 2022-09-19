@@ -88,7 +88,7 @@ fun ParticularMovieDto.toSeries() : Series{
         actors = actors?.split(",")?.map{ it.trim() }?: emptyList(),
         genres = genre?.split(",")?.map { it.trim() }?: emptyList(),
         country = country,
-        type = Movie.MovieType.Movie,
+        type = Movie.MovieType.Series,
         imdbID = imdbID,
         languages = language?.split(",")?.map { it.trim() }?: emptyList(),
         rated = rated,

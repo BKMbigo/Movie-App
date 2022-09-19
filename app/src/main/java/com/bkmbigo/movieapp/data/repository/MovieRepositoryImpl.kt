@@ -6,6 +6,7 @@ import com.bkmbigo.movieapp.data.dto.PSAripsFeed
 import com.bkmbigo.movieapp.data.dto.ParticularMovieDto
 import com.bkmbigo.movieapp.data.dto.SearchResultsDto
 import com.bkmbigo.movieapp.data.mapper.toMovie
+import com.bkmbigo.movieapp.domain.model.Film
 import com.bkmbigo.movieapp.domain.model.Movie
 import com.bkmbigo.movieapp.domain.repository.MovieRepository
 import com.bkmbigo.movieapp.utils.FirebaseCallback
@@ -13,7 +14,12 @@ import com.bkmbigo.movieapp.utils.WebApiCallback
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.Query
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -69,7 +75,15 @@ class MovieRepositoryImpl(
                                 callback.onResponse(emptyList())
                             }else{
                                 val movieList = searchResponse.search.map{ it.toMovie() }
-                                callback.onResponse(movieList)
+                                val firebaseCallback = object : FirebaseCallback<List<Movie>>{
+                                    override fun onSuccess(data: List<Movie>) {
+                                        callback.onResponse(data)
+                                    }
+                                    override fun onError(e: Exception) { callback.onFailure(e) }
+                                }
+                                runBlocking {
+                                    getMovieStatus(movieList, firebaseCallback)
+                                }
                             }
                         }else{
                             callback.onFailure(IllegalStateException("Invalid response from the API"))
@@ -101,7 +115,13 @@ class MovieRepositoryImpl(
                     ) {
                         val body = response.body()
                         if(body != null){
-                            val item = body.toMovie()
+                            val item = body.toMovie().also {
+                                it.watched = movie.watched
+                                it.favorite = movie.favorite
+                                it.bookmarked = movie.bookmarked
+                                it.downloaded = movie.downloaded
+                                it.onDownloadList = movie.onDownloadList
+                            }
                             callback.onResponse(item)
                         }else{
                             callback.onFailure(IllegalStateException())
@@ -121,22 +141,171 @@ class MovieRepositoryImpl(
         }
     }
 
+    override suspend fun getMovies(imdbIDs: List<String>, callback: WebApiCallback<List<Movie>>) {
+        val movies = ArrayList<Movie>()
+
+        val getMovieCallback = object: GetMoviesInterface{
+            var moviesRetrieved = 0
+            override fun movieRetrieved(data: Movie) {
+                movies.add(data)
+                completed()
+            }
+            private fun completed(){
+                moviesRetrieved++
+                if(moviesRetrieved >= imdbIDs.size){
+                    val statusCallback = object : FirebaseCallback<List<Movie>>{
+                        override fun onSuccess(data: List<Movie>) {
+                            callback.onResponse(data)
+                        }
+
+                        override fun onError(e: Exception) {
+                            callback.onFailure(e)
+                        }
+
+                    }
+                    runBlocking {
+                        getMovieStatus(movies, statusCallback)
+                    }
+                }
+            }
+
+        }
+
+        withContext(Dispatchers.IO){
+            imdbIDs.forEach { imdbID ->
+                val movie = Film(imdbID = imdbID, title = "", posterURL = "", year=null)
+                val movieCallback = object: WebApiCallback<Movie>{
+                    override fun onResponse(data: Movie) {
+                        getMovieCallback.movieRetrieved(data)
+                    }
+
+                    override fun onFailure(e: Exception?) { e?.let { callback.onFailure(it) }; return }
+                }
+                getMovieParticulars(movie, movieCallback)
+            }
+        }
+
+    }
+    private interface GetMoviesInterface{
+        fun movieRetrieved(data: Movie)
+    }
+
+    override suspend fun getMovieStatus(movies: List<Movie>, callback: FirebaseCallback<List<Movie>>) {
+        val movieStatusCallbacks = object: MovieStatusCallbacks<List<String>>{
+            var numberCompleted = 0
+
+            override fun onDownloadCompleted(data: List<String>) {
+                movies.forEach { movie -> movie.onDownloadList = data.contains(movie.imdbID) }
+                completed()
+            }
+
+            override fun onBookmarkCompleted(data: List<String>) {
+                movies.forEach { movie -> movie.bookmarked = data.contains(movie.imdbID)}
+                completed()
+            }
+
+            override fun onWatchListCompleted(data: List<String>) {
+                movies.forEach { movie -> movie.watched = data.contains(movie.imdbID)}
+                completed()
+            }
+
+            override fun onFavoriteCompleted(data: List<String>) {
+                movies.forEach { movie -> movie.favorite = data.contains(movie.imdbID)}
+                completed()
+            }
+
+            fun completed(){
+                numberCompleted++
+                if(numberCompleted < 4){
+                    return
+                }
+                numberCompleted = 0
+                callback.onSuccess(movies)
+            }
+
+        }
+
+        val downloadCallback = object: FirebaseCallback<List<String>>{
+            override fun onSuccess(data: List<String>) {
+                movieStatusCallbacks.onDownloadCompleted(data)
+            }
+            override fun onError(e: Exception) { callback.onError(e) }
+        }
+
+        val watchCallback = object: FirebaseCallback<List<String>>{
+            override fun onSuccess(data: List<String>) {
+                movieStatusCallbacks.onWatchListCompleted(data)
+            }
+            override fun onError(e: Exception) { callback.onError(e) }
+        }
+
+        val bookmarkCallback = object: FirebaseCallback<List<String>>{
+            override fun onSuccess(data: List<String>) {
+                movieStatusCallbacks.onBookmarkCompleted(data)
+            }
+            override fun onError(e: Exception) { callback.onError(e) }
+        }
+
+        val favoriteCallback = object: FirebaseCallback<List<String>>{
+            override fun onSuccess(data: List<String>) {
+                movieStatusCallbacks.onFavoriteCompleted(data)
+            }
+            override fun onError(e: Exception) { callback.onError(e) }
+        }
+
+        withContext(Dispatchers.IO){
+            val watch = async { getWatchList(watchCallback) }
+            val download = async { getDownloadList(downloadCallback) }
+            val bookmark = async { getBookmarked(bookmarkCallback) }
+            val favorite = async { getFavorites(favoriteCallback) }
+        }
+
+    }
+
+    private interface MovieStatusCallbacks<A>{
+        fun onDownloadCompleted(data: A)
+        fun onBookmarkCompleted(data: A)
+        fun onWatchListCompleted(data: A)
+        fun onFavoriteCompleted(data: A)
+    }
+
     //Firebase
-    override suspend fun getWatchList(callback: FirebaseCallback<List<Movie>>) {
+    override suspend fun getWatchList(
+        callback: FirebaseCallback<List<String>>,
+        type: Movie.MovieType?
+    ) {
         if(databaseReference == null){
             callback.onError(IllegalStateException("Database Reference is null"))
             return
         }
-        val watchReference: DatabaseReference =
-            databaseReference.child("movie").child("watch")
+
+        val watchReference: Query = when(type){
+            Movie.MovieType.Movie ->
+                databaseReference.child("movie").child("watch")
+                    .orderByChild("type").equalTo(Movie.MovieType.Movie.name)
+            Movie.MovieType.Series ->
+                databaseReference.child("movie").child("watch")
+                    .orderByChild("type").equalTo(Movie.MovieType.Series.name)
+            Movie.MovieType.Episode ->
+                databaseReference.child("movie").child("watch")
+                    .orderByChild("type").equalTo(Movie.MovieType.Episode.name)
+            Movie.MovieType.Game ->
+                databaseReference.child("movie").child("watch")
+                    .orderByChild("type").equalTo(Movie.MovieType.Game.name)
+
+            null -> databaseReference.child("movie").child("watch")
+        }
+
+
+
 
         val valueEventListener= object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                val resultList = ArrayList<Movie>()
+                val resultList = ArrayList<String>()
                 val list = snapshot.children.map{
-                    it.getValue(Movie::class.java)
+                    it.key
                 }
-                list.forEach { movie -> if(movie != null) { resultList.add(movie) } }
+                list.forEach { imdbID -> if(imdbID != null) { resultList.add(imdbID) } }
 
                 callback.onSuccess(resultList)
             }
@@ -145,7 +314,7 @@ class MovieRepositoryImpl(
         }
         watchReference.addValueEventListener(valueEventListener)
     }
-    override suspend fun getDownloadList(callback: FirebaseCallback<List<Movie>>) {
+    override suspend fun getDownloadList(callback: FirebaseCallback<List<String>>) {
         if(databaseReference == null){
             callback.onError(IllegalStateException("Database Reference is null"))
             return
@@ -156,9 +325,9 @@ class MovieRepositoryImpl(
 
         val valueEventListener= object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                val resultList = ArrayList<Movie>()
+                val resultList = ArrayList<String>()
                 val list = snapshot.children.map{
-                    it.getValue(Movie::class.java)
+                    it.key
                 }
                 list.forEach { movie -> if(movie != null) { resultList.add(movie) } }
 
@@ -169,7 +338,7 @@ class MovieRepositoryImpl(
         }
         downloadReference.addValueEventListener(valueEventListener)
     }
-    override suspend fun getBookmarked(callback: FirebaseCallback<List<Movie>>) {
+    override suspend fun getBookmarked(callback: FirebaseCallback<List<String>>) {
         if(databaseReference == null){
             callback.onError(IllegalStateException("Database Reference is null"))
             return
@@ -180,9 +349,9 @@ class MovieRepositoryImpl(
 
         val valueEventListener= object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                val resultList = ArrayList<Movie>()
+                val resultList = ArrayList<String>()
                 val list = snapshot.children.map{
-                    it.getValue(Movie::class.java)
+                    it.key
                 }
                 list.forEach { movie -> if(movie != null) { resultList.add(movie) } }
 
@@ -193,7 +362,7 @@ class MovieRepositoryImpl(
         }
         bookmarkedReference.addValueEventListener(valueEventListener)
     }
-    override suspend fun getFavorites(callback: FirebaseCallback<List<Movie>>) {
+    override suspend fun getFavorites(callback: FirebaseCallback<List<String>>) {
         if(databaseReference == null){
             callback.onError(IllegalStateException("Database Reference is null"))
             return
@@ -204,9 +373,9 @@ class MovieRepositoryImpl(
 
         val valueEventListener= object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                val resultList = ArrayList<Movie>()
+                val resultList = ArrayList<String>()
                 val list = snapshot.children.map{
-                    it.getValue(Movie::class.java)
+                    it.key
                 }
                 list.forEach { movie -> if(movie != null) { resultList.add(movie) } }
 
@@ -246,6 +415,7 @@ class MovieRepositoryImpl(
             downloadReference.child(movie.imdbID!!).let {
                 it.child("imdbID").setValue(movie.imdbID!!)
                 it.child("title").setValue(movie.title)
+                it.child("type").setValue(movie.type.name)
             }.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     movie.onDownloadList = true
@@ -284,6 +454,7 @@ class MovieRepositoryImpl(
             downloadReference.child(movie.imdbID!!).let {
                 it.child("imdbID").setValue(movie.imdbID!!)
                 it.child("title").setValue(movie.title)
+                it.child("type").setValue(movie.type.name)
             }.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     movie.watched = true
@@ -321,6 +492,7 @@ class MovieRepositoryImpl(
             downloadReference.child(movie.imdbID!!).let {
                 it.child("imdbID").setValue(movie.imdbID!!)
                 it.child("title").setValue(movie.title)
+                it.child("type").setValue(movie.type.name)
             }.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     movie.bookmarked = true
@@ -358,6 +530,7 @@ class MovieRepositoryImpl(
             downloadReference.child(movie.imdbID!!).let {
                 it.child("imdbID").setValue(movie.imdbID!!)
                 it.child("title").setValue(movie.title)
+                it.child("type").setValue(movie.type.name)
             }.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     movie.favorite = true
