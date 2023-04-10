@@ -18,7 +18,7 @@ interface PSAripsAPI {
         fun getClient(): PSAripsAPI{
             return INSTANCE?: synchronized(this){
                 val instance = Retrofit.Builder()
-                    .baseUrl("https://psa.pm/")
+                    .baseUrl("https://psa.re/")
                     .addConverterFactory(SimpleXmlConverterFactory.create())
                     .build()
                     .create(PSAripsAPI::class.java)
